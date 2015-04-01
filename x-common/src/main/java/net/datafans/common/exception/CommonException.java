@@ -1,4 +1,4 @@
-package net.datafans.common.http.exception;
+package net.datafans.common.exception;
 
 public class CommonException extends Exception {
 
