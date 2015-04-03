@@ -7,7 +7,9 @@ import net.datafans.common.http.constant.CommonAttribute;
 import net.datafans.common.http.constant.CommonParameter;
 import net.datafans.common.http.entity.AccessLog;
 import net.datafans.common.http.handler.AccessLogHandler;
+import net.datafans.common.http.handler.TokenHandler;
 import net.datafans.common.util.LogUtil;
+import net.datafans.common.util.PropertiesUtil;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class AccessLogInterceptor implements HandlerInterceptor {
 
 	@Autowired(required = false)
 	private AccessLogHandler logHandler;
+
+	@Autowired(required = false)
+	private TokenHandler tokenHandler;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -48,12 +53,17 @@ public class AccessLogInterceptor implements HandlerInterceptor {
 		log.setLogId(1);
 		log.setAccessTime(System.currentTimeMillis());
 		log.setClientHost(request.getRemoteHost());
-		log.setClientUniqueId(10000);
+
+		String token = request.getParameter("token");
+		if (tokenHandler != null && token != null) {
+			log.setClientUniqueId(tokenHandler.getUserId(token));
+		}
+
 		log.setParams(JSON.toJSONString(request.getParameterMap()));
 		log.setPath(request.getRequestURI());
 		log.setApiVersion(NumberUtils.toInt(request.getParameter(CommonParameter.API_VERSION)));
 		log.setDeviceType(NumberUtils.toInt(request.getParameter(CommonParameter.DEVICE_TYPE)));
-		log.setServerId("s1");
+		log.setServerId(PropertiesUtil.get("server.config", "server.id"));
 		log.setTimeCost(timeCost);
 
 		Object errorCode = request.getAttribute(CommonAttribute.RESPONSE_STATUS_CODE);
