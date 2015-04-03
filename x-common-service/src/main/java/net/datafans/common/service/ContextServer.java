@@ -1,9 +1,16 @@
 package net.datafans.common.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
 import net.datafans.common.shutdown.ShutdownListener;
+import net.datafans.common.util.LogUtil;
+import net.datafans.common.util.PropertiesUtil;
 import net.datafans.common.util.ShutdownUtil;
 import net.datafans.common.util.UncaughtExceptionUtil;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public abstract class ContextServer {
@@ -32,6 +39,9 @@ public abstract class ContextServer {
 	}
 
 	public void start() {
+		// 加载配置文件
+		loadConfig();
+
 		ClassPathXmlApplicationContext context = null;
 		try {
 			context = new ClassPathXmlApplicationContext(new String[] { contextPath });
@@ -90,4 +100,25 @@ public abstract class ContextServer {
 	public static interface StartHook {
 		void onStart();
 	}
+
+	private void loadConfig() {
+		String config = "server.config";
+		String serverId = PropertiesUtil.get(config, "server.id");
+		String[] configFiles = getConfigFileNames();
+		String configUrl = PropertiesUtil.get(config, "config.url");
+
+		try {
+			if (configFiles != null) {
+				for (String string : configFiles) {
+					String targetPath = Class.class.getResource("/").getPath() + "/" + string + ".properties";
+					FileUtils.copyURLToFile(new URL(configUrl + serverId + "/" + string + ".properties"), new File(
+							targetPath));
+				}
+			}
+		} catch (IOException e) {
+			LogUtil.error(ContextServer.class, "ERROR_LOAD_CONFIG_FILES " + e);
+		}
+	}
+
+	protected abstract String[] getConfigFileNames();
 }
