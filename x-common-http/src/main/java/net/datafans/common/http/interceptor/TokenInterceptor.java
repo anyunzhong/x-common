@@ -40,7 +40,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 		}
 
 		request.setAttribute(CommonAttribute.USER_ID, String.valueOf(userId));
-
+		
 		return true;
 	}
 

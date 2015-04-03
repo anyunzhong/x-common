@@ -32,7 +32,6 @@ public class ApiVersionInterceptor implements HandlerInterceptor {
 		} catch (VersionPathNotFoundException e) {
 			return true;
 		}
-		request.setAttribute("api_parsed", true);
 		request.getServletContext().getRequestDispatcher(realpath).forward(request, response);
 
 		return true;
