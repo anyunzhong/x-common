@@ -3,7 +3,7 @@ package net.datafans.common.http.aspect;
 import javax.servlet.http.HttpServletRequest;
 
 import net.datafans.common.http.annotation.Auth;
-import net.datafans.common.http.constant.CommonParameter;
+import net.datafans.common.http.constant.CommonAttribute;
 import net.datafans.common.http.exception.AuthFailedException;
 
 import org.aspectj.lang.JoinPoint;
@@ -30,9 +30,8 @@ public class AuthAspect {
 			}
 		}
 
-		Object token = request.getParameter(CommonParameter.TOKEN);
-
-		if (token == null) {
+		Object userId = request.getAttribute(CommonAttribute.USER_ID);
+		if (userId == null) {
 			throw new AuthFailedException();
 		}
 	}
