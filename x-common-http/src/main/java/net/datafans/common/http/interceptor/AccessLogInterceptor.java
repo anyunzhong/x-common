@@ -7,6 +7,7 @@ import net.datafans.common.http.constant.CommonAttribute;
 import net.datafans.common.http.constant.CommonParameter;
 import net.datafans.common.http.entity.AccessLog;
 import net.datafans.common.http.handler.AccessLogHandler;
+import net.datafans.common.http.util.UrlMatcher;
 import net.datafans.common.util.LogUtil;
 import net.datafans.common.util.PropertiesUtil;
 
@@ -25,6 +26,9 @@ public class AccessLogInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
+		if (UrlMatcher.versionParsed(request)) {
+			return true;
+		}
 		request.setAttribute(CommonAttribute.REQUEST_START_TIME, System.currentTimeMillis());
 
 		return true;
@@ -33,13 +37,11 @@ public class AccessLogInterceptor implements HandlerInterceptor {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		Object loged = request.getAttribute("api_loged");
-		if (loged == null || Boolean.parseBoolean(loged.toString()) == false) {
-			request.setAttribute("api_loged", true);
+
+		if (!UrlMatcher.versionParsed(request)) {
 			return;
 		}
 
-		request.setAttribute("api_loged", false);
 		Long startTime = NumberUtils.toLong(request.getAttribute(CommonAttribute.REQUEST_START_TIME).toString());
 		Long endTime = System.currentTimeMillis();
 		int timeCost = (int) (endTime - startTime);

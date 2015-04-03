@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.datafans.common.http.constant.CommonAttribute;
 import net.datafans.common.http.constant.CommonParameter;
 import net.datafans.common.http.handler.TokenHandler;
+import net.datafans.common.http.util.UrlMatcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,15 +20,26 @@ public class TokenInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		if (request.getAttribute(CommonAttribute.USER_ID) != null) {
+		if (!UrlMatcher.versionParsed(request)) {
 			return true;
 		}
 
 		String token = request.getParameter(CommonParameter.TOKEN);
-		int userId = tokenHandler.getUserId(token);
-		if (token != null && tokenHandler != null && userId != 0) {
-			request.setAttribute(CommonAttribute.USER_ID, String.valueOf(userId));
+
+		if (token == null) {
+			return true;
 		}
+
+		if (tokenHandler == null) {
+			return true;
+		}
+
+		int userId = tokenHandler.getUserId(token);
+		if (userId == 0) {
+			return true;
+		}
+
+		request.setAttribute(CommonAttribute.USER_ID, String.valueOf(userId));
 
 		return true;
 	}

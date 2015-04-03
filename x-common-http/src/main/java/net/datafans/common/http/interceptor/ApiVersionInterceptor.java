@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.datafans.common.http.constant.CommonParameter;
 import net.datafans.common.http.exception.VersionPathNotFoundException;
 import net.datafans.common.http.manager.VersionManager;
+import net.datafans.common.http.util.UrlMatcher;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +21,20 @@ public class ApiVersionInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		Object parsed = request.getAttribute("api_parsed");
-		if (parsed == null || Boolean.parseBoolean(parsed.toString()) == false) {
-			Integer apiVersion = NumberUtils.toInt(request.getParameter(CommonParameter.API_VERSION));
-			String realpath = null;
-			try {
-				realpath = manager.getRealPath(request.getRequestURI(), apiVersion);
-			} catch (VersionPathNotFoundException e) {
-				return true;
-			}
-			request.setAttribute("api_parsed", true);
-			request.getServletContext().getRequestDispatcher(realpath).forward(request, response);
+		if (UrlMatcher.versionParsed(request)) {
+			return true;
 		}
-		request.setAttribute("api_parsed", false);
+
+		Integer apiVersion = NumberUtils.toInt(request.getParameter(CommonParameter.API_VERSION));
+		String realpath = null;
+		try {
+			realpath = manager.getRealPath(request.getRequestURI(), apiVersion);
+		} catch (VersionPathNotFoundException e) {
+			return true;
+		}
+		request.setAttribute("api_parsed", true);
+		request.getServletContext().getRequestDispatcher(realpath).forward(request, response);
+
 		return true;
 	}
 
