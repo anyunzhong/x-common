@@ -4,8 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.datafans.common.http.annotation.Auth;
 import net.datafans.common.http.constant.CommonAttribute;
+import net.datafans.common.http.constant.CommonParameter;
 import net.datafans.common.http.exception.AuthFailedException;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -31,7 +33,10 @@ public class AuthAspect {
 		}
 
 		Object userId = request.getAttribute(CommonAttribute.USER_ID);
+		int requestUserId = NumberUtils.toInt(request.getParameter(CommonParameter.USER_ID));
 		if (userId == null) {
+			throw new AuthFailedException();
+		} else if (requestUserId != NumberUtils.toInt(userId.toString())) {
 			throw new AuthFailedException();
 		}
 	}

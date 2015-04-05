@@ -15,6 +15,7 @@ import net.datafans.common.http.annotation.Overload;
 import net.datafans.common.http.constant.CommonAttribute;
 import net.datafans.common.http.exception.AuthFailedException;
 import net.datafans.common.http.exception.OverloadSufferException;
+import net.datafans.common.http.handler.ErrorCodeHandler;
 import net.datafans.common.http.manager.OverloadManager;
 import net.datafans.common.http.manager.VersionManager;
 import net.datafans.common.http.response.ErrorResponse;
@@ -46,6 +47,9 @@ public class BaseController {
 
 	@Autowired
 	private OverloadManager overloadManager;
+
+	@Autowired(required = false)
+	private ErrorCodeHandler errorCodeHandler;
 
 	@RequestMapping(value = "/")
 	public Object defaultObject(HttpServletRequest request) {
@@ -162,12 +166,22 @@ public class BaseController {
 			rp.setErrorMsg(clientException.getErrorMsg());
 		} else if (ex instanceof AuthFailedException) {
 			// auth fail runtime exception
-			rp.setErrorCode(4000);
-			rp.setErrorMsg("auth fail");
+			if (errorCodeHandler != null) {
+				rp.setErrorCode(errorCodeHandler.onAuthFail().getErrorCode());
+				rp.setErrorMsg(errorCodeHandler.onAuthFail().getErrorMsg());
+			} else {
+				rp.setErrorCode(4000);
+				rp.setErrorMsg("auth fail");
+			}
 		} else if (ex instanceof OverloadSufferException) {
 			// overload suffer runtime exception
-			rp.setErrorCode(4001);
-			rp.setErrorMsg("overload suffer");
+			if (errorCodeHandler != null) {
+				rp.setErrorCode(errorCodeHandler.onOverload().getErrorCode());
+				rp.setErrorMsg(errorCodeHandler.onOverload().getErrorMsg());
+			} else {
+				rp.setErrorCode(4001);
+				rp.setErrorMsg("overload suffer");
+			}
 		} else {
 			rp.setErrorCode(500);
 			rp.setErrorMsg("server error unknown");
