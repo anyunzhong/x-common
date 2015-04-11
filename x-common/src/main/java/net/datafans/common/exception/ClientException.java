@@ -1,5 +1,6 @@
 package net.datafans.common.exception;
 
+
 public class ClientException extends CommonException {
 
 	private static final long serialVersionUID = 1L;
@@ -11,4 +12,5 @@ public class ClientException extends CommonException {
 	public ClientException(int code, String msg) {
 		super(code, msg);
 	}
+
 }

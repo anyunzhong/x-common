@@ -27,4 +27,11 @@ public class CommonException extends Exception {
 		this.errorMsg = errorMsg;
 	}
 
+	@Override
+	public String toString() {
+		return "CommonException [errorCode=" + errorCode + ", errorMsg=" + errorMsg + "]";
+	}
+	
+	
+
 }

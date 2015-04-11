@@ -23,6 +23,12 @@ public class HttpsqsQueue {
 		params.add(new BasicNameValuePair("data", msg));
 		HttpUtil.post(url + "?opt=put&name=" + queueName, params);
 	}
+	
+	public void put(String msg,String queueName) {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("data", msg));
+		HttpUtil.post(url + "?opt=put&name=" + queueName, params);
+	}
 
 	public String get() {
 		String msg = HttpUtil.get(url + "?opt=get&name=" + queueName);
