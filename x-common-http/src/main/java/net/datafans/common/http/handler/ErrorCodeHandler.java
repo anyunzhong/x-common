@@ -7,4 +7,6 @@ public interface ErrorCodeHandler {
 	ErrorResponse onAuthFail();
 
 	ErrorResponse onOverload();
+	
+	ErrorResponse onError(int errorCode);
 }
