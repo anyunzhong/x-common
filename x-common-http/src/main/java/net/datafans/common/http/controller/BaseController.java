@@ -163,15 +163,18 @@ public class BaseController {
 			// client exception
 			ClientException clientException = (ClientException) ex;
 			rp.setErrorCode(clientException.getErrorCode());
-			rp.setErrorMsg(clientException.getErrorMsg());
+			if (errorCodeHandler != null) {
+				rp.setErrorMsg(errorCodeHandler.onError(clientException.getErrorCode()).getErrorMsg());
+			}
+			
 		} else if (ex instanceof AuthFailedException) {
 			// auth fail runtime exception
 			if (errorCodeHandler != null) {
 				rp.setErrorCode(errorCodeHandler.onAuthFail().getErrorCode());
 				rp.setErrorMsg(errorCodeHandler.onAuthFail().getErrorMsg());
 			} else {
-				rp.setErrorCode(4000);
-				rp.setErrorMsg("auth fail");
+				rp.setErrorCode(2001);
+				rp.setErrorMsg("验证失败");
 			}
 		} else if (ex instanceof OverloadSufferException) {
 			// overload suffer runtime exception
@@ -179,18 +182,21 @@ public class BaseController {
 				rp.setErrorCode(errorCodeHandler.onOverload().getErrorCode());
 				rp.setErrorMsg(errorCodeHandler.onOverload().getErrorMsg());
 			} else {
-				rp.setErrorCode(4001);
-				rp.setErrorMsg("overload suffer");
+				rp.setErrorCode(1001);
+				rp.setErrorMsg("你把系统给刷残废了");
 			}
 		} else {
 			rp.setErrorCode(500);
-			rp.setErrorMsg("server error unknown");
+			rp.setErrorMsg("服务器未知错误");
 		}
 	}
 
 	private void sendErrorResponse(ErrorResponse rp, HttpServletResponse response) throws IOException {
+		
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8"); 
+		
 		PrintWriter writer = response.getWriter();
-		response.setHeader("Content-Type", "application/json");
 		String json = JSON.toJSONString(rp);
 		writer.write(json);
 		writer.flush();
