@@ -190,6 +190,7 @@ public class BaseController {
 
 	private void sendErrorResponse(ErrorResponse rp, HttpServletResponse response) throws IOException {
 		PrintWriter writer = response.getWriter();
+		response.setHeader("Content-Type", "application/json");
 		String json = JSON.toJSONString(rp);
 		writer.write(json);
 		writer.flush();
