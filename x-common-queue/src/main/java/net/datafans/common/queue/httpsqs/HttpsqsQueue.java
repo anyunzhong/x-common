@@ -31,7 +31,7 @@ public class HttpsqsQueue {
 	}
 
 	public String get() {
-		String msg = HttpUtil.get(url + "?opt=get&name=" + queueName);
+		String msg = HttpUtil.get(url + "?opt=get&charset=utf-8&name=" + queueName);
 		if (msg != null && !msg.equals("HTTPSQS_GET_END")) {
 			return msg.substring(5);
 		} else {
