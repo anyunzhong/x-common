@@ -14,7 +14,7 @@ public class UncaughtExceptionUtil {
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
-				LogUtil.error(UncaughtExceptionUtil.class, "THREAD_TERMINATE " + t + "   " + e);
+				LogUtil.error(UncaughtExceptionUtil.class, "THREAD_TERMINATE " + t, e);
 				e.printStackTrace();
 			}
 		});

@@ -48,7 +48,7 @@ public abstract class AbstractHttpServer implements HttpServer {
 			server.start();
 			server.join();
 		} catch (Exception e) {
-			LogUtil.error(this.getClass(), "SERVER_START_ERROR " + e);
+			LogUtil.error(this.getClass(), "SERVER_START_ERROR ", e);
 		}
 	}
 
@@ -81,7 +81,7 @@ public abstract class AbstractHttpServer implements HttpServer {
 				}
 			}
 		} catch (IOException e) {
-			LogUtil.error(AbstractHttpServer.class, "ERROR_LOAD_CONFIG_FILES " + e);
+			LogUtil.error(AbstractHttpServer.class, "ERROR_LOAD_CONFIG_FILES ", e);
 		}
 	}
 

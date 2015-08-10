@@ -9,28 +9,55 @@ public class LogUtil {
 
 	private final static ConcurrentHashMap<Class<?>, Logger> map = new ConcurrentHashMap<Class<?>, Logger>();
 
-	public static void info(Class<?> clazz, String str) {
+	public static void info(Class<?> clazz, String content, Throwable e) {
 
 		Logger logger = getLogger(clazz);
-		logger.info(str);
+		logger.info(content, e);
 	}
 
-	public static void error(Class<?> clazz, String str) {
+	public static void error(Class<?> clazz, String content, Throwable e) {
 
 		Logger logger = getLogger(clazz);
-		logger.error(str);
+		logger.error(content,e);
 	}
 
-	public static void debug(Class<?> clazz, String str) {
+	public static void debug(Class<?> clazz, String content, Throwable e) {
 		Logger logger = getLogger(clazz);
-		logger.debug(str);
+		logger.debug(content, e);
 	}
 
-	public static void warn(Class<?> clazz, String str) {
+	public static void warn(Class<?> clazz, String content, Throwable e) {
 
 		Logger logger = getLogger(clazz);
-		logger.warn(str);
+		logger.warn(content, e);
 	}
+	
+	
+	
+	public static void info(Class<?> clazz, String content) {
+
+		Logger logger = getLogger(clazz);
+		logger.info(content);
+	}
+
+	public static void error(Class<?> clazz, String content) {
+
+		Logger logger = getLogger(clazz);
+		logger.error(content);
+	}
+
+	public static void debug(Class<?> clazz, String content) {
+		Logger logger = getLogger(clazz);
+		logger.debug(content);
+	}
+
+	public static void warn(Class<?> clazz, String content) {
+
+		Logger logger = getLogger(clazz);
+		logger.warn(content);
+	}
+	
+	
 
 	private static Logger getLogger(Class<?> clazz) {
 		if (map.containsKey(clazz)) {

@@ -21,7 +21,7 @@ public class ShardedRedisDataSource {
 			ShardedJedis shardJedis = shardedJedisPool.getResource();
 			return shardJedis;
 		} catch (Exception e) {
-			LogUtil.error(this.getClass(), "getRedisClent error" + e);
+			LogUtil.error(this.getClass(), "getRedisClent error",e);
 		}
 		return null;
 	}

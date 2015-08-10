@@ -116,7 +116,7 @@ public abstract class ContextServer {
 				}
 			}
 		} catch (IOException e) {
-			LogUtil.error(ContextServer.class, "ERROR_LOAD_CONFIG_FILES " + e);
+			LogUtil.error(ContextServer.class, "ERROR_LOAD_CONFIG_FILES ", e);
 		}
 	}
 

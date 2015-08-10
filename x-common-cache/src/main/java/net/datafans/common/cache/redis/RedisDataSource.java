@@ -18,7 +18,7 @@ public class RedisDataSource {
 			}
 			return jedis;
 		} catch (Exception e) {
-			LogUtil.error(this.getClass(), "ERROR_GET_JEDIS_CLIENT" + e);
+			LogUtil.error(this.getClass(), "ERROR_GET_JEDIS_CLIENT", e);
 		}
 		return null;
 	}

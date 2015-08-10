@@ -103,7 +103,7 @@ public class BaseController {
 	public void exceptionHandler(Exception ex, HttpServletResponse response, HttpServletRequest request)
 			throws IOException {
 
-		LogUtil.error(BaseController.class, ex.toString());
+		LogUtil.error(BaseController.class, "BASE_ERROR", ex);
 		ex.printStackTrace();
 
 		response.setStatus(HttpStatus.OK_200);
