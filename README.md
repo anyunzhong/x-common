@@ -5,8 +5,8 @@
 * common-http支持日志纪录 验证 多版本管理 并发控制等实用功能
 * common-http输出的json数据格式与 DFCommon和AndroidCommon两个客户端SDK完美融合
 
-DFCommon(IOS): https://github.com/anyunzhong/DFCommon
-AndroidCommon: https://github.com/anyunzhong/AndroidCommon
+* DFCommon(IOS): https://github.com/anyunzhong/DFCommon
+* AndroidCommon: https://github.com/anyunzhong/AndroidCommon
 
 
 
