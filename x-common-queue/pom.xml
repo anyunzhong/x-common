@@ -1,49 +1,56 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.datafans</groupId>
-	<artifactId>x-common-queue</artifactId>
-	<version>1.0.0</version>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>x-common</artifactId>
+        <groupId>net.datafans</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>x-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-
-		<!-- httpclient -->
-		
-
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpasyncclient</artifactId>
-			<version>4.0.1</version>
-		</dependency>
-		<!-- httpclient -->
+    <artifactId>x-common-queue</artifactId>
 
 
-		<!-- aliyun -->
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>x-common-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>com.aliyun</groupId>
-			<artifactId>aliyun-mqs</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<!-- aliyun -->
-	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
+        <!-- httpclient -->
 
-		</plugins>
-	</build>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpasyncclient</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+        <!-- httpclient -->
+
+
+        <!-- aliyun -->
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-mqs</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- aliyun -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 </project>

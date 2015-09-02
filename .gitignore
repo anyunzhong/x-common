@@ -5,3 +5,12 @@
 
 target/
 
+
+#bin/
+
+
+.DS_Store
+
+.idea
+build/
+.gradle
