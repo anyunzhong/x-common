@@ -18,6 +18,7 @@
         <module>x-common-rdb</module>
         <module>x-common-service</module>
         <module>x-common-http</module>
+        <module>x-common-http-demo</module>
     </modules>
 
 

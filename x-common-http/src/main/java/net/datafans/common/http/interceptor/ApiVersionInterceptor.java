@@ -8,10 +8,12 @@ import net.datafans.common.http.exception.VersionPathNotFoundException;
 import net.datafans.common.http.manager.VersionManager;
 import net.datafans.common.http.util.UrlMatcher;
 
+import net.datafans.common.util.LogUtil;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import sun.rmi.runtime.Log;
 
 public class ApiVersionInterceptor implements HandlerInterceptor {
 
@@ -20,6 +22,10 @@ public class ApiVersionInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+		if (request.getRequestURI().equals("/")){
+			return false;
+		}
 
 		if (UrlMatcher.versionParsed(request)) {
 			return true;

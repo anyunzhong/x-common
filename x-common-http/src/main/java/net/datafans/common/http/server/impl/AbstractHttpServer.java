@@ -18,85 +18,90 @@ import org.eclipse.jetty.webapp.WebAppContext;
 
 public abstract class AbstractHttpServer implements HttpServer {
 
-	private Server server;
+    private Server server;
 
-	private void init() {
-		UncaughtExceptionUtil.sharedInstance().declare();
+    private void init() {
+        UncaughtExceptionUtil.sharedInstance().declare();
 
-		ShutdownUtil.sharedInstance().register(shutdownListener);
+        ShutdownUtil.sharedInstance().register(shutdownListener);
 
-		server = new Server(getPort());
+        server = new Server(getPort());
 
-		WebAppContext context = new WebAppContext();
+        WebAppContext context = new WebAppContext();
 
-		String classPath = Class.class.getResource("/").getPath();
-		context.setContextPath("/");
-		context.setResourceBase(classPath);
-		context.setDescriptor(classPath + "web.xml");
-		server.setHandler(context);
+        String classPath = Class.class.getResource("/").getPath();
+        context.setContextPath("/");
+        context.setResourceBase(classPath);
+        context.setDescriptor(classPath + "web.xml");
+        server.setHandler(context);
 
-	}
+    }
 
-	@Override
-	public void start() {
+    @Override
+    public void start() {
 
-		loadConfig();
+        if (loadRemoteConfig())
+            loadConfig();
 
-		init();
+        init();
 
-		try {
-			server.start();
-			server.join();
-		} catch (Exception e) {
-			LogUtil.error(this.getClass(), "SERVER_START_ERROR ", e);
-		}
-	}
+        try {
+            server.start();
+            server.join();
+        } catch (Exception e) {
+            LogUtil.error(this.getClass(), "SERVER_START_ERROR ", e);
+        }
+    }
 
-	private ShutdownListener shutdownListener = new ShutdownListener() {
-		@Override
-		public void shutdown() {
-			if (server != null) {
-				try {
-					server.stop();
-					LogUtil.info(AbstractHttpServer.class, "SERVER_SHUTDOWN_OK");
-				} catch (Exception e) {
-					LogUtil.error(AbstractHttpServer.class, "SERVER_SHUTDOWN_ERROR " + e);
-				}
-			}
-		}
-	};
+    private ShutdownListener shutdownListener = new ShutdownListener() {
+        @Override
+        public void shutdown() {
+            if (server != null) {
+                try {
+                    server.stop();
+                    LogUtil.info(AbstractHttpServer.class, "SERVER_SHUTDOWN_OK");
+                } catch (Exception e) {
+                    LogUtil.error(AbstractHttpServer.class, "SERVER_SHUTDOWN_ERROR " + e);
+                }
+            }
+        }
+    };
 
-	private void loadConfig() {
-		String config = "server.config";
-		String serverId = PropertiesUtil.get(config, "server.id");
-		String[] configFiles = getConfigFileNames();
-		String configUrl = PropertiesUtil.get(config, "config.url");
+    private void loadConfig() {
+        String config = "server.config";
+        String serverId = PropertiesUtil.get(config, "server.id");
+        String[] configFiles = getConfigFileNames();
+        String configUrl = PropertiesUtil.get(config, "config.url");
 
-		try {
-			if (configFiles != null) {
-				for (String string : configFiles) {
-					String targetPath = Class.class.getResource("/").getPath() + "/" + string + ".properties";
-					FileUtils.copyURLToFile(new URL(configUrl + serverId + "/" + string + ".properties"), new File(
-							targetPath));
-				}
-			}
-		} catch (IOException e) {
-			LogUtil.error(AbstractHttpServer.class, "ERROR_LOAD_CONFIG_FILES ", e);
-		}
-	}
+        try {
+            if (configFiles != null) {
+                for (String string : configFiles) {
+                    String targetPath = Class.class.getResource("/").getPath() + "/" + string + ".properties";
+                    FileUtils.copyURLToFile(new URL(configUrl + serverId + "/" + string + ".properties"), new File(
+                            targetPath));
+                }
+            }
+        } catch (IOException e) {
+            LogUtil.error(AbstractHttpServer.class, "ERROR_LOAD_CONFIG_FILES ", e);
+        }
+    }
 
-	protected abstract String[] getConfigFileNames();
+    protected abstract String[] getConfigFileNames();
 
-	protected int getPort() {
-		return Config.getPort();
-	}
+    protected int getPort() {
+        return Config.getPort();
+    }
 
-	public static class Config {
-		private final static String path = "server.properties";
+    protected boolean loadRemoteConfig() {
+        return true;
+    }
 
-		public static int getPort() {
-			return NumberUtils.toInt(PropertiesUtil.get(path, "port"));
-		}
-	}
+    public static class Config {
+        private final static String path = "server.properties";
+
+        public static int getPort() {
+            return NumberUtils.toInt(PropertiesUtil.get(path, "port"));
+        }
+    }
 
 }
