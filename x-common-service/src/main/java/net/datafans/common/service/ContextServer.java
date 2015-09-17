@@ -101,7 +101,15 @@ public abstract class ContextServer {
 		void onStart();
 	}
 
+
+	protected boolean loadRemoteConfig() {
+		return true;
+	}
+
 	private void loadConfig() {
+
+		if (!loadRemoteConfig()) return;
+
 		String config = "server.config";
 		String serverId = PropertiesUtil.get(config, "server.id");
 		String[] configFiles = getConfigFileNames();
