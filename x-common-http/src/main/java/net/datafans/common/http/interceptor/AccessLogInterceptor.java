@@ -1,8 +1,6 @@
 package net.datafans.common.http.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
 import net.datafans.common.http.constant.CommonAttribute;
 import net.datafans.common.http.constant.CommonParameter;
 import net.datafans.common.http.entity.AccessLog;
@@ -10,14 +8,15 @@ import net.datafans.common.http.handler.AccessLogHandler;
 import net.datafans.common.http.handler.ServerConfigHandler;
 import net.datafans.common.http.util.UrlMatcher;
 import net.datafans.common.util.LogUtil;
-import net.datafans.common.util.PropertiesUtil;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.eclipse.jetty.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSON;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class AccessLogInterceptor implements HandlerInterceptor {
 
@@ -55,7 +54,7 @@ public class AccessLogInterceptor implements HandlerInterceptor {
         AccessLog log = new AccessLog();
         log.setLogId(1);
         log.setAccessTime(System.currentTimeMillis());
-        log.setClientHost(request.getRemoteAddr());
+        log.setClientHost(AccessLogInterceptor.getRemoteAddrIp(request));
 
         Object userId = request.getAttribute(CommonAttribute.USER_ID);
         if (userId != null) {
@@ -86,6 +85,15 @@ public class AccessLogInterceptor implements HandlerInterceptor {
             logHandler.handle(log);
         }
 
+    }
+
+    private static String getRemoteAddrIp(HttpServletRequest request) {
+        String ipFromNginx = getHeader(request, "X-Real-IP");
+        return StringUtil.isBlank(ipFromNginx) ? request.getRemoteAddr() : ipFromNginx;
+    }
+    private static String getHeader(HttpServletRequest request, String headName) {
+        String value = request.getHeader(headName);
+        return !StringUtils.isBlank(value) && !"unknown".equalsIgnoreCase(value) ? value : "";
     }
 
     @Override
