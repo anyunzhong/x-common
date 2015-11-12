@@ -135,7 +135,7 @@ public class RedisCache {
 	 * 在某段时间后实现
 	 * 
 	 * @param key
-	 * @param unixTime
+	 * @param seconds
 	 * @return
 	 */
 	public Long expire(String key, int seconds) {
@@ -323,6 +323,32 @@ public class RedisCache {
 		try {
 			result = jedis.setex(key, seconds, value);
 
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			broken = true;
+		} finally {
+			redisDataSource.returnResource(jedis, broken);
+		}
+		return result;
+	}
+
+
+	/**
+	 * 模糊匹配
+	 *
+	 * @param patten
+	 * @return
+	 */
+	public Set<String> keys(String patten) {
+		Set<String> result = null;
+
+		Jedis jedis = redisDataSource.getRedisClient();
+		if (jedis == null) {
+			return result;
+		}
+		boolean broken = false;
+		try {
+			result = jedis.keys(patten);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			broken = true;
