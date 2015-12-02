@@ -163,9 +163,10 @@ public class BaseController {
 			// client exception
 			ClientException clientException = (ClientException) ex;
 			rp.setErrorCode(clientException.getErrorCode());
-			if (errorCodeHandler != null) {
-				rp.setErrorMsg(errorCodeHandler.onError(clientException.getErrorCode()).getErrorMsg());
-			}
+			rp.setErrorMsg(clientException.getErrorMsg());
+//			if (errorCodeHandler != null) {
+//				rp.setErrorMsg(errorCodeHandler.onError(clientException.getErrorCode()).getErrorMsg());
+//			}
 			
 		} else if (ex instanceof AuthFailedException) {
 			// auth fail runtime exception

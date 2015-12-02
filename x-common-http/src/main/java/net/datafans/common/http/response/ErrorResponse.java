@@ -1,6 +1,7 @@
 package net.datafans.common.http.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import net.datafans.common.exception.ErrorCodeItem;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class ErrorResponse extends BaseResponse {
@@ -15,6 +16,12 @@ public class ErrorResponse extends BaseResponse {
 		setStatus(ResponseStatus.STATUS_ERROR);
 		setErrorCode(errorCode);
 		setErrorMsg(errorMsg);
+	}
+
+	public ErrorResponse(ErrorCodeItem item){
+		setStatus(ResponseStatus.STATUS_ERROR);
+		setErrorCode(item.getCode());
+		setErrorMsg(item.getMsg());
 	}
 
 	public int getErrorCode() {
