@@ -6,7 +6,7 @@ public class AccessLog {
 	private int timeCost;
 	private String path;
 	private int apiVersion;
-	private int deviceType;
+	private int platform;
 	private String params;
 	private String clientHost;
 	private int clientUniqueId;
@@ -94,15 +94,6 @@ public class AccessLog {
 		this.errorMsg = errorMsg;
 	}
 
-
-	public int getDeviceType() {
-		return deviceType;
-	}
-
-	public void setDeviceType(int deviceType) {
-		this.deviceType = deviceType;
-	}
-
 	public int getApiVersion() {
 		return apiVersion;
 	}
@@ -114,11 +105,17 @@ public class AccessLog {
 	@Override
 	public String toString() {
 		return "AccessLog [logId=" + logId + ", accessTime=" + accessTime + ", timeCost=" + timeCost + ", path=" + path
-				+ ", apiVersion=" + apiVersion + ", deviceType=" + deviceType + ", params=" + params + ", clientHost="
+				+ ", apiVersion=" + apiVersion + ", platform=" + platform + ", params=" + params + ", clientHost="
 				+ clientHost + ", clientUniqueId=" + clientUniqueId + ", serverId=" + serverId + ", errorCode="
 				+ errorCode + ", errorMsg=" + errorMsg + "]";
 	}
-	
-	
 
+
+	public int getPlatform() {
+		return platform;
+	}
+
+	public void setPlatform(int platform) {
+		this.platform = platform;
+	}
 }

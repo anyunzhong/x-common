@@ -13,9 +13,14 @@ import net.datafans.common.exception.ClientException;
 import net.datafans.common.exception.ServerException;
 import net.datafans.common.http.annotation.Overload;
 import net.datafans.common.http.constant.CommonAttribute;
+import net.datafans.common.http.constant.CommonParameter;
+import net.datafans.common.http.entity.AccessLog;
 import net.datafans.common.http.exception.AuthFailedException;
 import net.datafans.common.http.exception.OverloadSufferException;
+import net.datafans.common.http.handler.AccessLogHandler;
 import net.datafans.common.http.handler.ErrorCodeHandler;
+import net.datafans.common.http.handler.ServerConfigHandler;
+import net.datafans.common.http.interceptor.AccessLogInterceptor;
 import net.datafans.common.http.manager.OverloadManager;
 import net.datafans.common.http.manager.VersionManager;
 import net.datafans.common.http.response.ErrorResponse;
@@ -50,6 +55,13 @@ public class BaseController {
 
 	@Autowired(required = false)
 	private ErrorCodeHandler errorCodeHandler;
+
+	@Autowired(required = false)
+	private AccessLogHandler logHandler;
+
+
+	@Autowired(required = false)
+	private ServerConfigHandler serverConfigHandler;
 
 	@RequestMapping(value = "/")
 	public Object defaultObject(HttpServletRequest request) {
@@ -114,7 +126,50 @@ public class BaseController {
 		request.setAttribute(CommonAttribute.RESPONSE_STATUS_CODE, rp.getErrorCode());
 		request.setAttribute(CommonAttribute.RESPONSE_STATUS_MSG, rp.getErrorMsg());
 
+		logError(request);
 		sendErrorResponse(rp, response);
+	}
+
+	private void logError(HttpServletRequest request){
+
+		Long startTime = NumberUtils.toLong(request.getAttribute(CommonAttribute.REQUEST_START_TIME).toString());
+		Long endTime = System.currentTimeMillis();
+		int timeCost = (int) (endTime - startTime);
+		LogUtil.info(this.getClass(), "REQUEST_TIME: " + timeCost);
+
+		AccessLog log = new AccessLog();
+		log.setLogId(1);
+		log.setAccessTime(System.currentTimeMillis());
+		log.setClientHost(AccessLogInterceptor.getRemoteAddrIp(request));
+
+		Object userId = request.getAttribute(CommonAttribute.USER_ID);
+		if (userId != null) {
+			log.setClientUniqueId(NumberUtils.toInt(userId.toString()));
+		}
+
+		log.setParams(JSON.toJSONString(request.getParameterMap()));
+		log.setPath(request.getRequestURI());
+		log.setApiVersion(NumberUtils.toInt(request.getParameter(CommonParameter.API_VERSION)));
+		log.setPlatform(NumberUtils.toInt(request.getParameter(CommonParameter.PLATFORM)));
+		if (serverConfigHandler != null)
+			log.setServerId(serverConfigHandler.getServerId());
+		else
+			log.setServerId("");
+		log.setTimeCost(timeCost);
+
+		Object errorCode = request.getAttribute(CommonAttribute.RESPONSE_STATUS_CODE);
+		if (errorCode != null) {
+			log.setErrorCode(NumberUtils.toInt(errorCode.toString()));
+		}
+
+		Object errorMsg = request.getAttribute(CommonAttribute.RESPONSE_STATUS_MSG);
+		if (errorMsg != null) {
+			log.setErrorMsg(errorMsg.toString());
+		}
+
+		if (logHandler != null) {
+			logHandler.handle(log);
+		}
 	}
 
 	private void fillErrorResponse(Exception ex, ErrorResponse rp) {

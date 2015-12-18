@@ -34,7 +34,7 @@ public class AccessLogInterceptor implements HandlerInterceptor {
             return true;
         }
         request.setAttribute(CommonAttribute.REQUEST_START_TIME, System.currentTimeMillis());
-
+        LogUtil.info(this.getClass(), "REQUEST_START: " + System.currentTimeMillis());
         return true;
     }
 
@@ -64,7 +64,7 @@ public class AccessLogInterceptor implements HandlerInterceptor {
         log.setParams(JSON.toJSONString(request.getParameterMap()));
         log.setPath(request.getRequestURI());
         log.setApiVersion(NumberUtils.toInt(request.getParameter(CommonParameter.API_VERSION)));
-        log.setDeviceType(NumberUtils.toInt(request.getParameter(CommonParameter.DEVICE_TYPE)));
+        log.setPlatform(NumberUtils.toInt(request.getParameter(CommonParameter.PLATFORM)));
         if (serverConfigHandler != null)
             log.setServerId(serverConfigHandler.getServerId());
         else
@@ -87,7 +87,8 @@ public class AccessLogInterceptor implements HandlerInterceptor {
 
     }
 
-    private static String getRemoteAddrIp(HttpServletRequest request) {
+
+    public static String getRemoteAddrIp(HttpServletRequest request) {
         String ipFromNginx = getHeader(request, "X-Real-IP");
         return StringUtil.isBlank(ipFromNginx) ? request.getRemoteAddr() : ipFromNginx;
     }
