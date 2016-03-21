@@ -18,7 +18,13 @@ public class LogUtil {
 	public static void error(Class<?> clazz, String content, Throwable e) {
 
 		Logger logger = getLogger(clazz);
-		logger.error(content,e);
+		logger.error(content, e);
+	}
+
+	public static void error(Class<?> clazz, Throwable e) {
+
+		Logger logger = getLogger(clazz);
+		logger.error(e.getMessage(),e);
 	}
 
 	public static void debug(Class<?> clazz, String content, Throwable e) {

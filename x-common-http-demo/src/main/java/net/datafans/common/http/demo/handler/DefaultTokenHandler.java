@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 public class DefaultTokenHandler implements TokenHandler {
 
 	@Override
-	public int getUserId(String token) {
+	public int getUserId(String token, String platform, String path) {
 		return 10086;
 	}
 

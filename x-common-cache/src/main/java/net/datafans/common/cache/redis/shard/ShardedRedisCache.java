@@ -32,9 +32,9 @@ public class ShardedRedisCache {
 	public ShardedRedisCache(int maxActive, int maxIdle, int maxWait, List<JedisShardInfo> shards) {
 
 		JedisPoolConfig config = new JedisPoolConfig();
-		config.setMaxActive(maxActive);
+		config.setMaxTotal(maxActive);
 		config.setMaxIdle(maxIdle);
-		config.setMaxWait(maxWait);
+		//config.setMaxWait(maxWait);
 		config.setTestOnBorrow(true);
 		config.setTestOnReturn(true);
 

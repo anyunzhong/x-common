@@ -29,13 +29,27 @@ public class RedisCache {
 	public RedisCache(int maxActive, int maxIdle, int maxWait, String host, int port, String password) {
 
 		JedisPoolConfig config = new JedisPoolConfig();
-		config.setMaxActive(maxActive);
-		config.setMaxIdle(maxIdle);
-		config.setMaxWait(maxWait);
-		config.setTestOnBorrow(true);
-		config.setTestOnReturn(true);
 
-		JedisPool pool = new JedisPool(config, host, port);
+//		config.setMaxTotal(maxActive);
+//		config.setMaxIdle(maxIdle);
+//		//config.setMaxWait(maxWait);
+//		config.setTestOnBorrow(true);
+//		config.setTestOnReturn(true);
+
+
+		//最大空闲连接数, 应用自己评估，不要超过AliCloudDB for Redis每个实例最大的连接数
+		config.setMaxIdle(maxIdle);
+		//最大连接数, 应用自己评估，不要超过AliCloudDB for Redis每个实例最大的连接数
+		config.setMaxTotal(maxActive);
+		config.setTestOnBorrow(false);
+		config.setTestOnReturn(false);
+
+		JedisPool pool;
+		if (password == null || password.equals("")){
+			pool = new JedisPool(config, host, port, 3000);
+		}else{
+			pool = new JedisPool(config, host, port, 3000, password);
+		}
 
 		redisDataSource = new RedisDataSource();
 		redisDataSource.setPool(pool);

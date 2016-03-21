@@ -18,12 +18,18 @@ public class AliyunODPS {
 
 	private DataTunnel tunnel;
 
+	private Odps odps;
+
+	public Odps getOdps() {
+		return odps;
+	}
+
 	public AliyunODPS(String accessKey, String accessSecret, String project) {
 
 		this.project = project;
 
 		Account account = new AliyunAccount(accessKey, accessSecret);
-		Odps odps = new Odps(account);
+		odps = new Odps(account);
 		odps.setEndpoint("http://service.odps.aliyun.com/api");
 		odps.setDefaultProject(project);
 		tunnel = new DataTunnel(odps);

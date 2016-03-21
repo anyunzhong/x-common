@@ -9,4 +9,6 @@ public class UUID {
 		int random = RandomUtils.nextInt(999999 - 100000 + 1) + 100000;
 		return Long.parseLong(new StringBuilder(String.valueOf(ts).substring(1)).append(random).toString());
 	}
+
+
 }

@@ -8,6 +8,7 @@ import net.datafans.common.http.constant.CommonParameter;
 import net.datafans.common.http.handler.TokenHandler;
 import net.datafans.common.http.util.UrlMatcher;
 
+import net.datafans.common.util.LogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,7 +35,8 @@ public class TokenInterceptor implements HandlerInterceptor {
 			return true;
 		}
 
-		int userId = tokenHandler.getUserId(token);
+		String platform = request.getParameter(CommonParameter.PLATFORM);
+		int userId = tokenHandler.getUserId(token, platform, request.getRequestURI());
 		if (userId == 0) {
 			return true;
 		}
