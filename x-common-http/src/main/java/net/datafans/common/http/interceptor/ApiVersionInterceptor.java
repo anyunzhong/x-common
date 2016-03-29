@@ -17,40 +17,42 @@ import sun.rmi.runtime.Log;
 
 public class ApiVersionInterceptor implements HandlerInterceptor {
 
-	@Autowired
-	private VersionManager manager;
+    @Autowired
+    private VersionManager manager;
 
-	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		if (request.getRequestURI().equals("/")){
-			return false;
-		}
+        response.setHeader("Access-Control-Allow-Origin", "*");
 
-		if (UrlMatcher.versionParsed(request)) {
-			return true;
-		}
+        if (request.getRequestURI().equals("/")) {
+            return false;
+        }
 
-		Integer apiVersion = NumberUtils.toInt(request.getParameter(CommonParameter.API_VERSION));
-		String realpath = null;
-		try {
-			realpath = manager.getRealPath(request.getRequestURI(), apiVersion);
-		} catch (VersionPathNotFoundException e) {
-			return true;
-		}
-		request.getServletContext().getRequestDispatcher(realpath).forward(request, response);
+        if (UrlMatcher.versionParsed(request)) {
+            return true;
+        }
 
-		return true;
-	}
+        Integer apiVersion = NumberUtils.toInt(request.getParameter(CommonParameter.API_VERSION));
+        String realpath = null;
+        try {
+            realpath = manager.getRealPath(request.getRequestURI(), apiVersion);
+        } catch (VersionPathNotFoundException e) {
+            return true;
+        }
+        request.getServletContext().getRequestDispatcher(realpath).forward(request, response);
 
-	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-			ModelAndView modelAndView) throws Exception {
-	}
+        return true;
+    }
 
-	@Override
-	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-			throws Exception {
-	}
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+                           ModelAndView modelAndView) throws Exception {
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
+    }
 
 }
