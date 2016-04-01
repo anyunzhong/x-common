@@ -1,6 +1,7 @@
 package net.datafans.common.http.interceptor;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import net.datafans.common.http.constant.CommonAttribute;
 import net.datafans.common.http.constant.CommonParameter;
 import net.datafans.common.http.entity.AccessLog;
@@ -17,6 +18,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AccessLogInterceptor implements HandlerInterceptor {
 
@@ -34,7 +38,14 @@ public class AccessLogInterceptor implements HandlerInterceptor {
             return true;
         }
         request.setAttribute(CommonAttribute.REQUEST_START_TIME, System.currentTimeMillis());
-        LogUtil.info(this.getClass(), "REQUEST_START: " + System.currentTimeMillis());
+        LogUtil.info(getClass(), "Path: " + request.getRequestURI());
+
+        Map map = new HashMap();
+        map.putAll(request.getParameterMap());
+        map.remove("token");
+        String prettyString = JSON.toJSONString(map, SerializerFeature.PrettyFormat);
+        LogUtil.info(getClass(), "Params: " + prettyString);
+
         return true;
     }
 
@@ -92,6 +103,7 @@ public class AccessLogInterceptor implements HandlerInterceptor {
         String ipFromNginx = getHeader(request, "X-Real-IP");
         return StringUtil.isBlank(ipFromNginx) ? request.getRemoteAddr() : ipFromNginx;
     }
+
     private static String getHeader(HttpServletRequest request, String headName) {
         String value = request.getHeader(headName);
         return !StringUtils.isBlank(value) && !"unknown".equalsIgnoreCase(value) ? value : "";
