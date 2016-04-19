@@ -91,7 +91,7 @@ public class HttpUtil {
 
             if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
                 if (entity != null) {
-                    result = EntityUtils.toString(entity);
+                    result = EntityUtils.toString(entity, HTTP.UTF_8);
                 }
             }
         } catch (IOException e) {
@@ -122,7 +122,7 @@ public class HttpUtil {
 
             if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
                 if (entity != null) {
-                    result = EntityUtils.toString(entity);
+                    result = EntityUtils.toString(entity,HTTP.UTF_8);
                 }
             }
         } catch (IOException e) {
@@ -155,7 +155,7 @@ public class HttpUtil {
 
             if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
                 if (entity != null) {
-                    result = EntityUtils.toString(entity);
+                    result = EntityUtils.toString(entity,HTTP.UTF_8);
                 }
             }
         } catch (IOException e) {
