@@ -7,6 +7,7 @@ public class AccessLog {
 	private String path;
 	private int apiVersion;
 	private int platform;
+	private int terminal;
 	private String params;
 	private String clientHost;
 	private int clientUniqueId;
@@ -117,5 +118,13 @@ public class AccessLog {
 
 	public void setPlatform(int platform) {
 		this.platform = platform;
+	}
+
+	public int getTerminal() {
+		return terminal;
+	}
+
+	public void setTerminal(int terminal) {
+		this.terminal = terminal;
 	}
 }
