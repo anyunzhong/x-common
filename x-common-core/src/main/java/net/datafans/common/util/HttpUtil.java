@@ -1,5 +1,6 @@
 package net.datafans.common.util;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -12,16 +13,24 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.*;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.security.*;
@@ -36,6 +45,7 @@ public class HttpUtil {
 
     private static HttpClient client;
 
+    @Deprecated
     public synchronized static HttpClient getHttpClient() {
 
         if (client == null) {
@@ -77,10 +87,38 @@ public class HttpUtil {
         return client;
     }
 
+
+    public synchronized static HttpClient getClient() {
+
+
+        try {
+
+            HttpParams params = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
+            HttpConnectionParams.setSoTimeout(params, SOCKET_TIMEOUT);
+            HttpConnectionParams.setStaleCheckingEnabled(params, true);
+
+//                ConnManagerParams.setMaxTotalConnections(params, 1000);
+//                ConnManagerParams.setTimeout(params, CONNECTION_MANAGER_TIMEOUT);
+//
+//                HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+//                HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+//
+//                SchemeRegistry registry = new SchemeRegistry();
+//                registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+//
+//                ClientConnectionManager ccm = new ThreadSafeClientConnManager(params, registry);
+            return new DefaultHttpClient(params);
+
+        } catch (Exception e) {
+            LogUtil.error(HttpUtil.class, e);
+        }
+
+        return null;
+    }
+
     public static String get(String url) {
-        //HttpClient httpClient = getHttpClient();
-        HttpClient httpClient = new DefaultHttpClient();
-        httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10 * 1000);
+        HttpClient httpClient = getClient();
         HttpGet get = new HttpGet(url);
 
         HttpResponse response;
@@ -103,15 +141,40 @@ public class HttpUtil {
         return result;
     }
 
+
+    public static byte[] getBytes(String url) {
+        HttpClient httpClient = getClient();
+        HttpGet get = new HttpGet(url);
+
+        HttpResponse response;
+        try {
+            response = httpClient.execute(get);
+            HttpEntity entity = response.getEntity();
+
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+                if (entity != null) {
+                    InputStream inputStream = entity.getContent();
+                    return IOUtils.toByteArray(inputStream);
+                }
+            }
+        } catch (IOException e) {
+            LogUtil.error(HttpUtil.class, e);
+        } finally {
+            get.releaseConnection();
+        }
+
+        return null;
+    }
+
     public static String post(String url, List<NameValuePair> params) {
 
-        HttpClient httpClient = new DefaultHttpClient();
-        //HttpClient httpClient = getHttpClient();
+        HttpClient httpClient = getClient();
         HttpPost post = new HttpPost(url);
         try {
             post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+
         } catch (UnsupportedEncodingException e) {
-           LogUtil.error(HttpUtil.class, e);
+            LogUtil.error(HttpUtil.class, e);
         }
 
         HttpResponse response;
@@ -122,7 +185,66 @@ public class HttpUtil {
 
             if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
                 if (entity != null) {
-                    result = EntityUtils.toString(entity,HTTP.UTF_8);
+                    result = EntityUtils.toString(entity, HTTP.UTF_8);
+                }
+            }
+        } catch (IOException e) {
+            LogUtil.error(HttpUtil.class, e);
+        } finally {
+            post.releaseConnection();
+
+        }
+
+        return result;
+    }
+
+
+    public static String postFile(String url, String file) {
+
+        HttpClient httpClient = getClient();
+        HttpPost post = new HttpPost(url);
+        MultipartEntity multipartEntity = new MultipartEntity();
+        multipartEntity.addPart("file", new FileBody(new File(file)));
+        post.setEntity(multipartEntity);
+
+        HttpResponse response;
+        String result = null;
+        try {
+            response = httpClient.execute(post);
+            HttpEntity entity = response.getEntity();
+
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+                if (entity != null) {
+                    result = EntityUtils.toString(entity, HTTP.UTF_8);
+                }
+            }
+        } catch (IOException e) {
+            LogUtil.error(HttpUtil.class, e);
+        } finally {
+            post.releaseConnection();
+
+        }
+
+        return result;
+    }
+
+    public static String postFileBytes(String url, byte[] bytes) {
+
+        HttpClient httpClient = getClient();
+        HttpPost post = new HttpPost(url);
+        MultipartEntity multipartEntity = new MultipartEntity();
+        multipartEntity.addPart("file", new ByteArrayBody(bytes, "test.jpeg"));
+        post.setEntity(multipartEntity);
+
+        HttpResponse response;
+        String result = null;
+        try {
+            response = httpClient.execute(post);
+            HttpEntity entity = response.getEntity();
+
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+                if (entity != null) {
+                    result = EntityUtils.toString(entity, HTTP.UTF_8);
                 }
             }
         } catch (IOException e) {
@@ -138,8 +260,7 @@ public class HttpUtil {
 
     public static String post(String url, String body) {
 
-        HttpClient httpClient = new DefaultHttpClient();
-        //HttpClient httpClient = getHttpClient();
+        HttpClient httpClient = getClient();
         HttpPost post = new HttpPost(url);
         try {
             post.setEntity(new StringEntity(body, HTTP.UTF_8));
@@ -155,7 +276,7 @@ public class HttpUtil {
 
             if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
                 if (entity != null) {
-                    result = EntityUtils.toString(entity,HTTP.UTF_8);
+                    result = EntityUtils.toString(entity, HTTP.UTF_8);
                 }
             }
         } catch (IOException e) {
@@ -167,6 +288,73 @@ public class HttpUtil {
 
         return result;
     }
+
+
+    public static byte[] postByte(String url, String body) {
+
+        HttpClient httpClient = getClient();
+        HttpPost post = new HttpPost(url);
+        try {
+            post.setEntity(new StringEntity(body, HTTP.UTF_8));
+        } catch (UnsupportedEncodingException e) {
+            LogUtil.error(HttpUtil.class, e);
+        }
+
+        HttpResponse response;
+        byte[] result = null;
+        try {
+            response = httpClient.execute(post);
+            HttpEntity entity = response.getEntity();
+
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+                if (entity != null) {
+                    result = IOUtils.toByteArray(entity.getContent());
+                }
+            }
+        } catch (IOException e) {
+            LogUtil.error(HttpUtil.class, e);
+        } finally {
+            post.releaseConnection();
+
+        }
+
+        return result;
+    }
+
+
+
+
+    public static String post(String url, String body, String encode) {
+
+        HttpClient httpClient = getClient();
+        HttpPost post = new HttpPost(url);
+        try {
+            post.setEntity(new StringEntity(body, HTTP.UTF_8));
+        } catch (UnsupportedEncodingException e) {
+            LogUtil.error(HttpUtil.class, e);
+        }
+
+        HttpResponse response;
+        String result = null;
+        try {
+            response = httpClient.execute(post);
+            HttpEntity entity = response.getEntity();
+
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+                if (entity != null) {
+                    result = EntityUtils.toString(entity, encode);
+                }
+            }
+        } catch (IOException e) {
+            LogUtil.error(HttpUtil.class, e);
+        } finally {
+            post.releaseConnection();
+
+        }
+
+        return result;
+    }
+
 
 
     static class SSLSocketFactoryEx extends SSLSocketFactory {
