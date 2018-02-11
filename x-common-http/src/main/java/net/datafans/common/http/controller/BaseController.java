@@ -150,6 +150,7 @@ public class BaseController {
         log.setPath(request.getRequestURI());
         log.setApiVersion(NumberUtils.toInt(request.getParameter(CommonParameter.API_VERSION)));
         log.setPlatform(NumberUtils.toInt(request.getParameter(CommonParameter.PLATFORM)));
+        log.setTerminal(NumberUtils.toInt(request.getParameter(CommonParameter.TERMINAL)));
         if (serverConfigHandler != null)
             log.setServerId(serverConfigHandler.getServerId());
         else

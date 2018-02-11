@@ -10,6 +10,7 @@ import com.aliyun.odps.data.Record;
 import com.aliyun.odps.data.RecordWriter;
 import com.aliyun.odps.tunnel.DataTunnel;
 import com.aliyun.odps.tunnel.UploadSession;
+import net.datafans.common.util.LogUtil;
 
 @SuppressWarnings("deprecation")
 public class AliyunODPS {
@@ -51,7 +52,7 @@ public class AliyunODPS {
 			recordWriter.close();
 			uploadSession.commit(new Long[] { 0L });
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.error(getClass(), e);
 		}
 
 	}
@@ -72,7 +73,7 @@ public class AliyunODPS {
 			recordWriter.close();
 			uploadSession.commit(new Long[] { 0L });
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.error(getClass(), e);
 		}
 
 	}
